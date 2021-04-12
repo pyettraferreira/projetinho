@@ -22,20 +22,25 @@ class ViewController: UIViewController {
 //        Model(title: "Pastel Green", color: UIColor(red: 0.60, green: 1.00, blue: 0.60, alpha: 1.00)),
 //        Model(title: "Pastel Purple", color: UIColor(red: 0.80, green: 0.60, blue: 1.00, alpha: 1.00))
 //    ]
-    private var models: [Contact]?
     private var api: API?
+    private var contacts: [Contact] = [Contact(id: 1, name: "Beyonce", photoURL: "https://picsum.photos/100/100")]
+    private var contatos: [Contact]?
+    
+    override func viewWillAppear(_ animated: Bool) {
+        api = API(delegate: self)
+        api?.fetch()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        api = API(delegate: self)
-        api?.fetch()
     }
 }
 
 extension ViewController: APIDelegate {
     func onSuccess(contacts: [Contact]) {
-//        models = contacts
-        print(models)
+        self.contatos = contacts
+        print("Aqui contatos")
+        print(contatos)
     }
     
     func onError(error: String) {
@@ -50,8 +55,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let model = models?[indexPath.row] else { return <#default value#> }
-
+        print("contatos aqui")
+        print(contatos)
+        let model = contacts[indexPath.row]
+        
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as? Cell else {
             fatalError("Essa célula tem que retornar")
         }

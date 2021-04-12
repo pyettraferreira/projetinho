@@ -46,8 +46,8 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="image" destination="JhG-ym-fzR" id="PIK-9h-Z3c"/>
-                                            <outlet property="label" destination="LYb-Hy-u6F" id="bvB-zE-63A"/>
+                                            <outlet property="nameLabel" destination="LYb-Hy-u6F" id="jul-YQ-OEA"/>
+                                            <outlet property="photoImageView" destination="JhG-ym-fzR" id="LTe-RR-8c2"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

@@ -11,11 +11,11 @@ import UIKit
 class Cell: UITableViewCell {
     
     @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var photoImgView: UIImageView!
+    @IBOutlet weak var photoImageView: UIImageView!
     
     func configure(cellModel: Contact) {
         nameLabel.text = cellModel.name
-        photoImgView.image = load(url: cellModel.photoURL)
+        photoImageView.image = load(url: cellModel.photoURL)
     }
     
     func load(url: String) -> UIImage {
