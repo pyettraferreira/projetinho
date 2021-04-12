@@ -10,9 +10,17 @@ import UIKit
 
 class Cell: UITableViewCell {
     
-    @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var photoImgView: UIImageView!
     
-    func configure(title: String) {
-        label.text = title
+    func configure(cellModel: Contact) {
+        nameLabel.text = cellModel.name
+        photoImgView.image = load(url: cellModel.photoURL)
+    }
+    
+    func load(url: String) -> UIImage {
+        let imageURL = URL(string: url)!
+        let imageData = try! Data(contentsOf: imageURL)
+        return UIImage(data: imageData)!
     }
 }
