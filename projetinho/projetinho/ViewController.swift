@@ -4,43 +4,83 @@
 //
 //  Created by Pyettra Ferreira on 29/03/21.
 //
-
 import UIKit
 
-class ViewController: UIViewController {
-    
-    @IBOutlet weak var tableView: UITableView!
-//    let models: [Model] = [
-//        Model(title: "Vibrant Blue", color: UIColor(red: 0.00, green: 0.00, blue: 1.00, alpha: 1.00)),
-//        Model(title: "Vibrant Pink", color: UIColor(red: 1.00, green: 0.00, blue: 1.00, alpha: 1.00)),
-//        Model(title: "Vibrant Yellow", color: UIColor(red: 1.00, green: 1.00, blue: 0.00, alpha: 1.00)),
-//        Model(title: "Vibrant Green", color: UIColor(red: 0.00, green: 1.00, blue: 0.00, alpha: 1.00)),
-//        Model(title: "Vibrant Purple", color: UIColor(red: 0.50, green: 0.00, blue: 1.00, alpha: 1.00)),
-//        Model(title: "Pastel Blue", color: UIColor(red: 0.40, green: 0.70, blue: 1.00, alpha: 1.00)),
-//        Model(title: "Pastel Pink", color: UIColor(red: 1.00, green: 0.60, blue: 1.00, alpha: 1.00)),
-//        Model(title: "Pastel Yellow", color: UIColor(red: 1.00, green: 1.00, blue: 0.60, alpha: 1.00)),
-//        Model(title: "Pastel Green", color: UIColor(red: 0.60, green: 1.00, blue: 0.60, alpha: 1.00)),
-//        Model(title: "Pastel Purple", color: UIColor(red: 0.80, green: 0.60, blue: 1.00, alpha: 1.00))
-//    ]
-    private var api: API?
-    private var contacts: [Contact] = [Contact(id: 1, name: "Beyonce", photoURL: "https://picsum.photos/100/100")]
-    private var contatos: [Contact]?
-    
-    override func viewWillAppear(_ animated: Bool) {
-        api = API(delegate: self)
-        api?.fetch()
+private extension ViewController.Layout {
+    enum TableView {
+        static let rowHeight = UITableView.automaticDimension
+        static let estimatedRowHeight: CGFloat = 100
     }
+}
+
+final class ViewController: UIViewController {
+    fileprivate enum Layout { }
+    
+    // MARK: - Views
+    
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.separatorStyle = .none
+        tableView.rowHeight = Layout.TableView.rowHeight
+        tableView.estimatedRowHeight = Layout.TableView.estimatedRowHeight
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.register(Cell.self, forCellReuseIdentifier: "cell")
+        return tableView
+    }()
+
+    private var api: API?
+    private var contatos = [Contact]()
+    
+    // MARK: - Initializer
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        buildLayout()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        api = API(delegate: self)
+        api?.fetch()
+    }
+}
+
+// MARK: - ViewConfiguration
+
+extension ViewController: ViewLayoutable {
+    func buildHierarchy() {
+        view.addSubview(tableView)
+    }
+    
+    func buildConstraints() {
+        let tableViewConstraints = [
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ]
+        
+        NSLayoutConstraint.activate(tableViewConstraints)
+    }
+    
+    func buildAdditionalSetUp() {
+        tableView.dataSource = self
+        tableView.delegate = self
     }
 }
 
 extension ViewController: APIDelegate {
     func onSuccess(contacts: [Contact]) {
         self.contatos = contacts
-        print("Aqui contatos")
-        print(contatos)
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     func onError(error: String) {
@@ -51,15 +91,15 @@ extension ViewController: APIDelegate {
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        contatos.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         print("contatos aqui")
         print(contatos)
-        let model = contacts[indexPath.row]
+        let model = contatos[indexPath.row]
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as? Cell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? Cell else {
             fatalError("Essa célula tem que retornar")
         }
 

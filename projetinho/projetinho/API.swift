@@ -21,7 +21,8 @@ class API {
         self.delegate = delegate
     }
     
-    func fetch() {
+    func fetch(completion: @escaping (Result<[Contact]>, String) -> Void) {
+        
         let urlRequest = URLRequest(url: url)
         let urlSession = URLSession.shared
         let task = urlSession.dataTask(with: urlRequest) { data, _, error in
