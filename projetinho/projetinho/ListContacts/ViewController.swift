@@ -18,6 +18,8 @@ final class ViewController: UIViewController {
     
     // MARK: - Views
     
+    private lazy var activityIndicator = UIActivityIndicatorView(style: .medium)
+    
     private lazy var tableView: UITableView = {
         let tableView = UITableView()
         tableView.separatorStyle = .none
@@ -25,16 +27,19 @@ final class ViewController: UIViewController {
         tableView.estimatedRowHeight = Layout.TableView.estimatedRowHeight
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.register(Cell.self, forCellReuseIdentifier: "cell")
+        tableView.backgroundView = activityIndicator
         return tableView
     }()
 
-    private var api: API?
+    private var presenter: Presenting
     private var contatos = [Contact]()
     
     // MARK: - Initializer
     
-    init() {
+    init(presenter: Presenting = Presenter()) {
+        self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
+        self.presenter.view = self
         buildLayout()
     }
     
@@ -46,8 +51,7 @@ final class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        api = API(delegate: self)
-        api?.fetch()
+        presenter.fetch()
     }
 }
 
@@ -75,16 +79,24 @@ extension ViewController: ViewLayoutable {
     }
 }
 
-extension ViewController: APIDelegate {
-    func onSuccess(contacts: [Contact]) {
+extension ViewController: Displaying {
+    func showLoading() {
+        activityIndicator.startAnimating()
+    }
+    
+    func hideLoad() {
+        activityIndicator.stopAnimating()
+    }
+    
+    func show(contacts: [Contact]) {
         self.contatos = contacts
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
     }
     
-    func onError(error: String) {
-        print(error)
+    func show(message: String) {
+        print(message)
     }
 }
 
