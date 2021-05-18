@@ -90,13 +90,13 @@ extension ViewController: Displaying {
     
     func show(contacts: [Contact]) {
         self.contatos = contacts
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
+        self.tableView.reloadData()
     }
     
     func show(message: String) {
-        print(message)
+        let alert = UIAlertController(title: "Erro!", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        self.present(alert, animated: true)
     }
 }
 
@@ -107,8 +107,6 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        print("contatos aqui")
-        print(contatos)
         let model = contatos[indexPath.row]
         
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? Cell else {

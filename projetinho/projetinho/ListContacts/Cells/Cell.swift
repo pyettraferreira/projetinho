@@ -36,26 +36,12 @@ final class Cell: UITableViewCell {
     
     func configure(cellModel: Contact) {
         nameLabel.text = cellModel.name
-        load(url: cellModel.photoURL) { [weak self] image in
-            self?.photoImageView.image = image
-        }
+        photoImageView.setImage(path: cellModel.photoURL)
     }
     
-    func load(url: String, completion: @escaping (UIImage?) -> Void) {
-        guard let imageURL = URL(string: url) else { completion(nil); return }
-        
-        DispatchQueue.global().async {
-            do {
-                let imageData = try Data(contentsOf: imageURL)
-                DispatchQueue.main.async {
-                    completion(UIImage(data: imageData))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(nil)
-                }
-            }
-        }
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        photoImageView.cancelRequest()
     }
 }
 
@@ -92,3 +78,6 @@ extension Cell: ViewLayoutable {
         photoImageView.translatesAutoresizingMaskIntoConstraints = false
     }
 }
+
+
+
